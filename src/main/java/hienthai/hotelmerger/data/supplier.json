@@ -1,0 +1,30 @@
+[
+  {
+    "id": "String",
+    "destination_id": "String",
+    "name":  "String",
+    "end_point": "String",
+    "location": {
+      "lat": "String",
+      "lng": "String",
+      "address": "String",
+      "city": "String",
+      "country": "String"
+    },
+    "description": "String",
+    "amenity": {
+      "general": "String",
+      "room": "String"
+    },
+    "images": {
+      "room": "String",
+      "site": "String",
+      "amenity": "String"
+    },
+    "image": {
+      "link": "String",
+      "description": "String"
+    },
+    "booking_conditions": "String"
+  }
+]
