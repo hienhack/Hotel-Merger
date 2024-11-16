@@ -56,16 +56,20 @@ public class App {
     }
 
     public static void main(String[] args) {
-        if (args.length != 2) {
-            System.out.println("Invalid args elements count");
-            return;
-        }
+//        if (args.length != 2) {
+//            System.out.println("Invalid args elements count");
+//            return;
+//        }
+//
+//        String[] hotelIds = args[0].split(",");
+//        String[] locationIds = args[1].split(",");
+//
+//        App app = new App();
+//        Object json = app.find(hotelIds, locationIds);
+//        System.out.println(json);
 
-        String[] hotelIds = args[0].split(",");
-        String[] locationIds = args[1].split(",");
-
-        App app = new App();
-        Object json = app.find(hotelIds, locationIds);
-        System.out.println(json);
+        SupplierRepository supplierRepository = new JsonSupplierRepository();
+        List<Supplier> suppliers = supplierRepository.getAll();
+        System.out.println(suppliers.size());
     }
 }

@@ -17,7 +17,7 @@ public class Supplier {
     public static Set<String> keySet = Set.of(
             "id", "destination_id", "name", "location.lat", "location.lng", "location.address",
             "location.city", "location.country", "description", "amenity.general", "amenity.room",
-            "images.room", "images.site", "images.amenity", "image.link", "image.description", "booking_condition"
+            "images.room", "images.site", "images.amenity", "image.link", "image.description", "booking_conditions"
     );
 
     private String endPoint;
@@ -27,8 +27,14 @@ public class Supplier {
         this.key2KeyMap = key2KeyMap;
         this.endPoint = endPoint;
 
-        if (!key2KeyMap.keySet().containsAll(keySet)) {
-            throw new RuntimeException("Error mapping key from database");
+//        if (!key2KeyMap.keySet().containsAll(keySet)) {
+//            throw new RuntimeException("Error mapping key from database");
+//        }
+
+        for (String key : keySet) {
+            if (!key2KeyMap.containsKey(key)) {
+                System.out.println("No mapping for key: " + key);
+            }
         }
     }
 

@@ -11,4 +11,14 @@ public class Image {
 
     public String getLink() { return this.link; }
     public String getDescription() { return this.description; }
+
+    public String toJson() {
+        return String.format("{\"link\": \"%s\", \"description\": \"%s\"}", link, description);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Image)) return false;
+        return ((Image) o).link.equals(this.link);
+    }
 }

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class JsonSupplierRepository implements SupplierRepository {
-    private static final String FILE_PATH = "";
+    private static final String FILE_PATH = "data/supplier.json";
 
     @Override
     public List<Supplier> getAll() {
@@ -24,7 +24,7 @@ public class JsonSupplierRepository implements SupplierRepository {
             }
 
         } catch (IOException e) {
-            System.err.format("Error reading json data");
+            System.err.println("Error reading json data: " + e.getMessage());
         }
 
         return suppliers;
@@ -52,13 +52,13 @@ public class JsonSupplierRepository implements SupplierRepository {
         k2kMap.put("amenity.room", (String)amenity.get("room"));
 
         Map<String, Object> images = (Map<String, Object>)item.get("images");
-        k2kMap.put("images.room", (String)amenity.get("room"));
-        k2kMap.put("images.site", (String)amenity.get("site"));
-        k2kMap.put("images.amenity", (String)amenity.get("amenity"));
+        k2kMap.put("images.room", (String)images.get("room"));
+        k2kMap.put("images.site", (String)images.get("site"));
+        k2kMap.put("images.amenity", (String)images.get("amenity"));
 
         Map<String, Object> image = (Map<String, Object>)item.get("image");
-        k2kMap.put("image.link", (String)amenity.get("link"));
-        k2kMap.put("image.description", (String)amenity.get("description"));
+        k2kMap.put("image.link", (String)image.get("link"));
+        k2kMap.put("image.description", (String)image.get("description"));
 
         return new Supplier(endPoint, k2kMap);
     }
