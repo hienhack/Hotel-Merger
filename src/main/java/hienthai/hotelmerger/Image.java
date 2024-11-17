@@ -1,4 +1,4 @@
-package hienthai.hotelmerger.model;
+package hienthai.hotelmerger;
 
 public class Image {
     private String link;
@@ -9,11 +9,12 @@ public class Image {
         this.description = description;
     }
 
-    public String getLink() { return this.link; }
-    public String getDescription() { return this.description; }
+    public String getLink() {
+        return this.link;
+    }
 
-    public String toJson() {
-        return String.format("{\"link\": \"%s\", \"description\": \"%s\"}", link, description);
+    public String getDescription() {
+        return this.description;
     }
 
     @Override

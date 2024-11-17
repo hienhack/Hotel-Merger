@@ -1,44 +1,23 @@
 package hienthai.hotelmerger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hienthai.hotelmerger.model.Image;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Supplier {
-    public static Set<String> keySet = Set.of(
-            "id", "destination_id", "name", "location.lat", "location.lng", "location.address",
-            "location.city", "location.country", "description", "amenity.general", "amenity.room",
-            "images.room", "images.site", "images.amenity", "image.link", "image.description", "booking_conditions"
-    );
-
     private String endPoint;
     private Map<String, String> key2KeyMap;
 
     public Supplier(String endPoint, Map<String, String> key2KeyMap) {
         this.key2KeyMap = key2KeyMap;
         this.endPoint = endPoint;
-
-//        if (!key2KeyMap.keySet().containsAll(keySet)) {
-//            throw new RuntimeException("Error mapping key from database");
-//        }
-
-        for (String key : keySet) {
-            if (!key2KeyMap.containsKey(key)) {
-                System.out.println("No mapping for key: " + key);
-            }
-        }
     }
 
-    // Fetch data from the endpoint
     public Map<String, Hotel> fetch() {
         Map<String, Hotel> hotels = new HashMap<>();
         HttpClient client = HttpClient.newHttpClient();
@@ -58,34 +37,38 @@ public class Supplier {
                 }
 
         } catch (IOException e) {
-            System.err.format("Error reading json data");
+            throw new RuntimeException("Error reading json data");
         } catch (Exception e) {
-            System.err.format("Error fetching data from %s", endPoint);
+            throw new RuntimeException(String.format("Error while fetching data from %s: %s\n", endPoint, e.getMessage()));
         }
 
-        return null;
+        return hotels;
     }
 
+    // Parse an object of mapped json to Hotel object
     private Hotel parse(Map<String, Object> item) {
-        String id = (String)JsonHelper.getFromKeyPath(key2KeyMap.get("id"), item);
-        String name = (String)JsonHelper.getFromKeyPath(key2KeyMap.get("name"), item);
-        String destinationId = (String)JsonHelper.getFromKeyPath(key2KeyMap.get("name"), item);
-        float locationLat = (float)JsonHelper.getFromKeyPath(key2KeyMap.get("location.lat"), item);
-        float locationLng = (float)JsonHelper.getFromKeyPath(key2KeyMap.get("location.lng"), item);
-        String locationAddress = (String)JsonHelper.getFromKeyPath(key2KeyMap.get("location.address"), item);
-        String locationCity = (String)JsonHelper.getFromKeyPath(key2KeyMap.get("location.city"), item);
-        String locationCountry = (String)JsonHelper.getFromKeyPath(key2KeyMap.get("location.country"), item);
-        String description = (String)JsonHelper.getFromKeyPath(key2KeyMap.get("description"), item);
-        List<String> generalAmenities = (List<String>)JsonHelper.getFromKeyPath(key2KeyMap.get("amenity.general"), item);
-        List<String> roomAmenities = (List<String>)JsonHelper.getFromKeyPath(key2KeyMap.get("amenity.room"), item);
+        String id = (String) getFromKeyPath(key2KeyMap.get("id"), item);
+        String name = (String) getFromKeyPath(key2KeyMap.get("name"), item);
 
-        List<Image> roomImages = (List<Image>)JsonHelper.getFromKeyPath(key2KeyMap.get(""), item);
+        Integer destinationId = Integer.valueOf("" + getFromKeyPath(key2KeyMap.get("destination_id"), item));
 
-        List<Image> siteImages = (List<Image>)JsonHelper.getFromKeyPath(key2KeyMap.get("name"), item);
+        Double locationLat = convertToDouble("" + getFromKeyPath(key2KeyMap.get("location.lat"), item));
+        Double locationLng = convertToDouble("" + getFromKeyPath(key2KeyMap.get("location.lng"), item));
 
-        List<Image> amenityImages = (List<Image>)JsonHelper.getFromKeyPath(key2KeyMap.get("amenity"), item);
+        String locationAddress = (String) getFromKeyPath(key2KeyMap.get("location.address"), item);
+        String locationCity = (String) getFromKeyPath(key2KeyMap.get("location.city"), item);
+        String locationCountry = (String) getFromKeyPath(key2KeyMap.get("location.country"), item);
 
-        List<String> bookingConditions = (List<String>)JsonHelper.getFromKeyPath(key2KeyMap.get("booking_conditions"), item);
+        String description = (String) getFromKeyPath(key2KeyMap.get("description"), item);
+
+        List<String> generalAmenities = (List<String>) getFromKeyPath(key2KeyMap.get("amenity.general"), item);
+        List<String> roomAmenities = (List<String>) getFromKeyPath(key2KeyMap.get("amenity.room"), item);
+
+        List<Image> roomImages = convertToImageList((List<Map<String, String>>) getFromKeyPath(key2KeyMap.get("images.room"), item));
+        List<Image> siteImages = convertToImageList((List<Map<String, String>>) getFromKeyPath(key2KeyMap.get("images.site"), item));
+        List<Image> amenityImages = convertToImageList((List<Map<String, String>>) getFromKeyPath(key2KeyMap.get("images.amenity"), item));
+
+        List<String> bookingConditions = (List<String>) getFromKeyPath(key2KeyMap.get("booking_conditions"), item);
 
         Hotel hotel = new Hotel(
                 id, name, destinationId, locationLat, locationLng, locationAddress, locationCity, locationCountry,
@@ -93,5 +76,40 @@ public class Supplier {
         );
 
         return hotel;
+    }
+
+    private Double convertToDouble(String value) {
+        Double result = null;
+        try {
+            result = Double.valueOf(value);
+        } catch (Exception e) {
+            result = null;
+        }
+
+        return result;
+    }
+
+    private List<Image> convertToImageList(List<Map<String, String>> list) {
+        if (list == null) return null;
+        List<Image> result = new ArrayList<>();
+        for (Map<String, String> imgMap : list) {
+            result.add(new Image(imgMap.get(key2KeyMap.get("image.link")),
+                    imgMap.get(key2KeyMap.get("image.description"))));
+        }
+
+        return result;
+    }
+
+    // Get the value of a field in mapped json object using its path
+    private Object getFromKeyPath(String path, Map<String, Object> item) {
+        if (path == null) return null;
+        String[] keys = path.split("\\.");
+
+        Map<String, Object> currentObject = item;
+        for (int i = 0; i < keys.length - 1; i++) {
+            currentObject = (Map<String, Object>) currentObject.get(keys[i]);
+        }
+
+        return currentObject.get(keys[keys.length - 1]);
     }
 }

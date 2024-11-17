@@ -3,10 +3,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class JsonSupplierRepository implements SupplierRepository {
     private static final String FILE_PATH = "data/supplier.json";
@@ -36,9 +33,9 @@ public class JsonSupplierRepository implements SupplierRepository {
 
         k2kMap.put("id", (String)item.get("id"));
         k2kMap.put("destination_id", (String)item.get("destination_id"));
-        k2kMap.put("name", (String)item.get("end_point"));
-        k2kMap.put("description", (String)item.get("end_point"));
-        k2kMap.put("booking_conditions", (String)item.get("end_point"));
+        k2kMap.put("name", (String)item.get("name"));
+        k2kMap.put("description", (String)item.get("description"));
+        k2kMap.put("booking_conditions", (String)item.get("booking_conditions"));
 
         Map<String, Object> location = (Map<String, Object>)item.get("location");
         k2kMap.put("location.lat", (String)location.get("lat"));

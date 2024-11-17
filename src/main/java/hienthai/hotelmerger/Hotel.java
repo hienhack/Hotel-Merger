@@ -1,15 +1,15 @@
 package hienthai.hotelmerger;
 
-import hienthai.hotelmerger.model.Image;
-
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Hotel {
     private String id;
     private String name;
-    private String destinationId;
-    private float locationLat;
-    private float locationLng;
+    private Integer destinationId;
+    private Double locationLat;
+    private Double locationLng;
     private String locationAddress;
     private String locationCity;
     private String locationCountry;
@@ -22,7 +22,7 @@ public class Hotel {
     private List<String> bookingConditions;
 
     public Hotel(
-            String id, String name, String destinationId, float locationLat, float locationLng,
+            String id, String name, Integer destinationId, Double locationLat, Double locationLng,
             String locationAddress, String locationCity, String locationCountry, String description,
             List<String> generalAmenities, List<String> roomAmenities, List<Image> roomImages,
             List<Image> siteImages, List<Image> amenityImages, List<String> bookingConditions
@@ -44,61 +44,55 @@ public class Hotel {
          this.bookingConditions = bookingConditions;
     }
 
-    public String toJson() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("{\n");
-        builder.append("  \"id\": \"").append(id).append("\",\n");
-        builder.append("  \"destination_id\": \"").append(destinationId).append("\",\n");
-        builder.append("  \"name\": \"").append(name).append("\",\n");
-        builder.append("  \"location\": {\n");
-        builder.append("    \"lat\": ").append(locationLat).append(",\n");
-        builder.append("    \"lng\": ").append(locationLng).append(",\n");
-        builder.append("    \"address\": ").append(locationAddress).append(",\n");
-        builder.append("    \"city\": ").append(locationCity).append(",\n");
-        builder.append("    \"country\": ").append(locationCountry).append("\n");
-        builder.append("  },\n");
-        builder.append("  \"description\": \"").append(description).append("\",\n");
+    // Mapping data to a map which is used to convert to json
+    public Map<String, Object> toDataMap() {
+        Map<String, Object> dataMap = new LinkedHashMap<>();
 
-        builder.append("  \"amenities\": {\n");
-        builder.append("    \"general\": [\"").append(String.join("\", \"", generalAmenities)).append("\"],");
-        builder.append("    \"room\": [\"").append(String.join("\", \"", roomAmenities)).append("\"],");
-        builder.append("  },\n");
+        dataMap.put("id", id);
+        dataMap.put("destination_id", destinationId);
+        dataMap.put("name", name);
 
-        builder.append("  \"images\": {\n");
-        builder.append("    \"rooms\": [\n");
-        builder.append("      ").append(String.join(",\n", roomImages.stream().map(Image::toJson).toList()));
-        builder.append("    ],\n");
-        builder.append("    \"site\": [\n");
-        builder.append("      ").append(String.join(",\n", siteImages.stream().map(Image::toJson).toList()));
-        builder.append("    ],\n");
-        builder.append("    \"amenities\": [\n");
-        builder.append("      ").append(String.join(",\n", amenityImages.stream().map(Image::toJson).toList()));
-        builder.append("    ],\n");
+        Map<String, Object> location = new LinkedHashMap<>();
+        location.put("lat", locationLat);
+        location.put("lng", locationLng);
+        location.put("address", locationAddress);
+        location.put("city", locationCity);
+        location.put("country", locationCountry);
+        dataMap.put("location", location);
 
-        builder.append("  \"booking_conditions\": [\n");
-        builder.append("    \"").append(String.join("\",\n", bookingConditions)).append("\"\n");
-        builder.append("  ]");
-        builder.append("}");
+        dataMap.put("description", description);
+        dataMap.put("amenities", Map.of(
+           "general", generalAmenities,
+           "room", roomAmenities
+        ));
 
-        return builder.toString();
+        dataMap.put("images", Map.of(
+                "rooms", roomImages,
+                "site", siteImages,
+                "amenities", amenityImages
+        ));
+
+        dataMap.put("booking_conditions", bookingConditions);
+
+        return dataMap;
     }
 
     public String getId() {
         return this.id;
     }
 
-    public String getDestinationId() {
+    public Integer getDestinationId() {
         return this.destinationId;
     }
     public String getName() {
         return name;
     }
 
-    public float getLocationLat() {
+    public Double getLocationLat() {
         return locationLat;
     }
 
-    public float getLocationLng() {
+    public Double getLocationLng() {
         return locationLng;
     }
 
