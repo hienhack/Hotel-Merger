@@ -4,14 +4,15 @@ import java.util.List;
 import java.util.Set;
 
 public class SimpleCleaningStrategy implements CleaningStrategy {
+    // Stuck words exceptions, such as terms or abbreviations
     private static final Set<String> STUCK_WORD_EXCEPTIONS = Set.of("TV", "WiFi");
 
     @Override
     public Hotel clean(Hotel hotel) {
         String name = standardize(hotel.getName());
-        String locationAddress = standardize(hotel.getDescription());
-        String locationCity = standardize(hotel.getDescription());
-        String locationCountry = standardize(hotel.getDescription());
+        String locationAddress = standardize(hotel.getLocationAddress());
+        String locationCity = standardize(hotel.getLocationCity());
+        String locationCountry = standardize(hotel.getLocationCountry());
         String description = standardize(hotel.getDescription());
 
         List<String> roomAmenities = standardize(hotel.getRoomAmenities());
@@ -34,7 +35,7 @@ public class SimpleCleaningStrategy implements CleaningStrategy {
         String[] words = str.split(" ");
         for (int i = 0; i < words.length; i++) {
             if (STUCK_WORD_EXCEPTIONS.contains(words[i])) continue;
-            words[i] = words[i].replaceAll("(?<!^|\\s)([A-Z])", " $1");
+            words[i] = words[i].replaceAll("(?<!^|\\s|[A-Z-])([A-Z])", " $1");
         }
         str = String.join(" ", words);
 
