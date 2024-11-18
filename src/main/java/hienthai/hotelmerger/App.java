@@ -8,6 +8,7 @@ import java.util.*;
 public class App {
     private final SupplierRepository supplierRepository = new JsonSupplierRepository();
     private final MergeStrategy mergeStrategy = new SimpleMergeStrategy();
+    private final CleaningStrategy cleaningStrategy = new SimpleCleaningStrategy();
     private Map<String, Hotel> hotels = new HashMap<>();
 
     public App() {
@@ -16,12 +17,18 @@ public class App {
 
     private void prepareData() {
         List<Supplier> suppliers = supplierRepository.getAll();
-        List<Map<String, Hotel>> fetchedHotels = new ArrayList<>();
+        List<Map<String, Hotel>> supplierFetchedHotels = new ArrayList<>();
         Set<String> hotelsId = new HashSet<>();
 
         for (Supplier supplier : suppliers) {
             Map<String, Hotel> hotels = supplier.fetch();
-            fetchedHotels.add(hotels);
+
+            // Clean data
+            hotels.replaceAll((id, hotel) -> {
+                return cleaningStrategy.clean(hotel);
+            });
+
+            supplierFetchedHotels.add(hotels);
 
             // Save distinct hotels' id
             hotelsId.addAll(hotels.keySet());
@@ -30,7 +37,7 @@ public class App {
         // Find all hotels with the same id and merge them
         for (String id : hotelsId) {
             List<Hotel> conflictHotels = new ArrayList<>();
-            for (Map<String, Hotel> hotels : fetchedHotels) {
+            for (Map<String, Hotel> hotels : supplierFetchedHotels) {
                 if (hotels.containsKey(id)) {
                     conflictHotels.add(hotels.get(id));
                 }

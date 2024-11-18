@@ -16,7 +16,7 @@ public class SimpleMergeStrategy implements MergeStrategy {
         String id = hotels[0].getId();
         Integer destinationId = hotels[0].getDestinationId();
 
-        String name = mergeString(Arrays.stream(hotels).map(hotel -> standardizeString(hotel.getName())).toList());
+        String name = mergeString(Arrays.stream(hotels).map(Hotel::getName).toList());
 
         Double lat = findMostFrequentElement(Arrays.stream(hotels).map(Hotel::getLocationLat).toList());
         Double lng = findMostFrequentElement(Arrays.stream(hotels).map(Hotel::getLocationLng).toList());
@@ -25,7 +25,7 @@ public class SimpleMergeStrategy implements MergeStrategy {
         String country = mergeString(Arrays.stream(hotels).map(Hotel::getLocationCountry).toList());
 
         // Choose the longest description
-        String description = Arrays.stream(hotels).map(hotel -> standardizeString(hotel.getDescription()))
+        String description = Arrays.stream(hotels).map(Hotel::getDescription)
                 .filter(Objects::nonNull)
                 .reduce((d1, d2) -> d1.length() >= d2.length() ? d1 : d2).get();
 
@@ -68,9 +68,9 @@ public class SimpleMergeStrategy implements MergeStrategy {
 
     // Merge a string field by choosing the most frequent value
     private String mergeString(List<String> list) {
-        List<String> uppercased = list.stream().filter(Objects::nonNull).map(String::toUpperCase).toList();
-        String temp = findMostFrequentElement(uppercased);
-        int index = uppercased.indexOf(temp);
+        List<String> uppercaseList = list.stream().filter(Objects::nonNull).map(String::toUpperCase).toList();
+        String temp = findMostFrequentElement(uppercaseList);
+        int index = uppercaseList.indexOf(temp);
         String result = list.stream().filter(Objects::nonNull).toList().get(index);
         return result;
     }
@@ -112,24 +112,14 @@ public class SimpleMergeStrategy implements MergeStrategy {
         for (List<String> strList : list) {
             if (strList == null) continue;
             for (String str : strList) {
-                if (str.isBlank()) continue;
-                String standardized = standardizeString(str);
-                if (!existed.containsKey(standardized.toUpperCase())) {
-                    existed.put(standardized.toUpperCase(), standardized);
+                if (str == null || str.isBlank()) continue;
+                if (!existed.containsKey(str.toUpperCase())) {
+                    existed.put(str.toUpperCase(), str);
                 }
             }
         }
 
         List<String> result = existed.values().stream().toList();
         return result;
-    }
-
-    private String standardizeString(String source) {
-        if (source == null) return null;
-
-        // Remove leading and trailing space
-        String result = source.trim();
-
-        return result.substring(0, 1).toUpperCase() + result.substring(1);
     }
 }

@@ -9,6 +9,14 @@ public class Image {
         this.description = description;
     }
 
+    public void setLink(String link) {
+        this.link = link;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public String getLink() {
         return this.link;
     }
