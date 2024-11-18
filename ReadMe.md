@@ -2,7 +2,8 @@
 Multiple sources data fetching, merging and cleaning using a few basic rules
 
 ## How does it work?
-* ...  
+* Suppliers are loaded from mapped JSON objects in the supplier.json file so that we can easily add or modify a supplier without touching the code
+* ...
 
 ## How to run?
 * Compile: mvn clean package
