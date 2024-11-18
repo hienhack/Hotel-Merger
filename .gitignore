@@ -1,1 +1,2 @@
-/target/
+/target/*
+!/target/hotel-merger-1.0.jar
